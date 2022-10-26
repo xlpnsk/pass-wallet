@@ -1,0 +1,190 @@
+@import url("//fonts.googleapis.com/css?family=Rubik:300,400,600,700&amp;lang=en");
+
+body{
+  font-family: Rubik;
+}
+
+:root{
+  --black: hsla(0, 0%, 0%, 1);
+  --oxford-blue: hsla(221, 51%, 16%, 1);
+  --orange-web: hsla(37, 98%, 53%, 1);
+  --platinum: hsla(0, 0%, 90%, 1);
+}
+
+*, *::before, *::after{
+  box-sizing: border-box;
+}
+
+button{
+  all: unset;
+  padding: 10px 15px;
+  min-width: fit-content;
+  border-radius: 15px;
+  background-color: var(--orange-web);
+  border: 2px solid var(--orange-web);
+  cursor: pointer;
+  transition: all .3s ease;
+  font-weight: bolder;
+  color: var(--oxford-blue);
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Toastify button:hover{
+  background-color: transparent;
+}
+
+.close-btn{
+  margin-left: auto;
+}
+
+.new-back-btn{
+  margin-top: 15px;
+  margin-right: 20px;
+}
+
+.home{
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 120px);
+  justify-content: center;
+  align-items: center;
+}
+
+header h2{
+  color: var(--orange-web);
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+form{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+input{
+  border-radius: 10px;
+  border: 2px solid var(--oxford-blue);
+  outline: none;
+  min-height: 30px;
+  padding: 10px 15px;
+}
+
+.error{
+  color: red;
+  font-size: 0.8em;
+  font-weight: bolder;
+}
+
+.password-field{
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+}
+
+.password-field button{
+  height: 100%;
+}
+
+
+button:hover{
+  background-color: var(--oxford-blue);
+  color: var(--orange-web);
+}
+
+header{
+  background-color: var(--oxford-blue);
+  color: var(--platinum);
+  padding: 20px;
+  height: 120px;
+}
+
+h1{
+  color: var(--orange-web);
+  margin-top: 0;
+}
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+.link{
+  text-decoration: none;
+  font-size: 1.1em;
+  color: var(--orange-web);
+  font-weight: bolder;
+  
+  position: relative
+}
+
+.link::after{
+  content: '';
+  display: block;
+  width: 0%;
+  height: 1px;
+  position: absolute;
+  top: 100%;
+  transition: all .3s ease;
+  background-color: var(--orange-web);
+}
+
+.link:hover::after{
+  width: 100%;
+}
+
+.checkbox-label{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.header-links{
+  display: flex;
+  flex-direction: row;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+}

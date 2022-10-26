@@ -1,0 +1,65 @@
+version: '3.6'
+services:
+  db:
+    container_name: db
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - my-db:/var/lib/mysql
+  #front
+  front:
+    container_name: front
+    restart: always
+    environment: 
+      - REACT_APP_API_URL=http://localhost:3001
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: http://localhost:3001
+    ports:
+      - '3000:3000'
+    expose:
+      - '3000'
+    depends_on:
+      - "back"
+      - "db"    
+  #back
+  back:
+    container_name: back
+    restart: always
+    env_file: 
+      - ./.env 
+    environment: 
+      - NODE_ENV=production
+      - DATABASE_URL=mysql://user:password@db:3306/db
+      - JWT_SECRET=${JWT_SECRET}
+      - PEPPER=${PEPPER} 
+      - HMAC_PASSPHRASE=${HMAC_PASSPHRASE}
+      - CRYPTO_IV=${CRYPTO_IV}
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+      args:
+        DATABASE_URL: "mysql://user:password@db:3306/db"
+        JWT_SECRET: ${JWT_SECRET}
+        PEPPER: ${PEPPER} 
+        HMAC_PASSPHRASE: ${HMAC_PASSPHRASE}
+        CRYPTO_IV: ${CRYPTO_IV}
+    ports:
+      - '3001:3000'
+    expose:
+      - '3000'
+    depends_on:
+      - "db"            
+volumes:
+  my-db:
