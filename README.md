@@ -1,9 +1,9 @@
 ## /db
-docker compose up
+`docker compose up`
 
 ## /back
-npx prisma migrate dev
-npm run start:dev
+`npx prisma migrate dev` \
+`npm run start:dev`
 
 ## /front
-npm run start
+`npm run start`
