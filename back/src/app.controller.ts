@@ -9,6 +9,11 @@ import { JwtUserDto } from 'dtos/JwtUser.dto';
 export class AppController {
   constructor(private readonly appService: AppService, private authService: AuthService) {}
 
+  @Get('/')
+  async helloCheck(){
+    return this.appService.getHello()
+  }
+
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
   async login(@Request() req){

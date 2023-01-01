@@ -11,12 +11,12 @@ import { UsersService } from 'src/users/users.service';
 export class WalletService {
   constructor(private prisma: PrismaService, private cryptoService: CryptoService, private userService: UsersService){}
 
-
   async getAllPasswords(userId:number){
     const user = await this.userService.findOneById(userId);
     const walletRecords = await this.prisma.walletRecord.findMany({where: {userId: user.id}})
     return walletRecords
   }
+  
   async getPasswordList(userId:number): Promise<PasswordListDto[]>{
     const user = await this.userService.findOneById(userId);
     const walletRecords: PasswordListDto[] = await this.prisma.walletRecord.findMany({select: {id: true, webAddress:true, login:true, description:true},where: {userId: user.id}})

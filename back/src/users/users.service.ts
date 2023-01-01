@@ -19,6 +19,10 @@ export class UsersService {
     return await this.prisma.user.findUnique({where:{login:login}});
   }
 
+  async findOneWithLastLoginRecord(login: string) {
+    return await this.prisma.user.findFirst({include: { logins: { include: { ipAddress: true }, orderBy: { loginTime: 'desc' }, take: 1 } }, where:{ login:login }});
+  }
+
   async findOneById(id: number): Promise<User | undefined> {
     return await this.prisma.user.findUnique({where:{id:id}});
   }

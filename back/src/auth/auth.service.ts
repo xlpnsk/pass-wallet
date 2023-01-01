@@ -5,6 +5,27 @@ import { RegisterDto } from 'dtos/Register.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CryptoService } from 'src/crypto/crypto.service';
 import * as bcrypt from 'bcrypt';
+import { User } from '@prisma/client';
+import { IpRecordService } from 'src/ip-record/ip-record.service';
+import { CreateIpRecordDto } from 'dtos/CreateIpRecord.dto';
+import { UpdateIpRecordDto } from 'dtos/UpdateIpRecord.dto';
+import { LoginRecordService } from 'src/login-record/login-record.service';
+import { CreateLoginRecordDto } from 'dtos/CreateLoginRecord.dto';
+
+
+
+export interface IValidationError{
+  message: string
+}
+
+export interface IUserData{
+  id: number;
+  login: string;
+}
+
+export function isError(userOrError: IUserData | IValidationError): userOrError is IValidationError {
+  return (<IValidationError>userOrError).message !== undefined;
+}
 
 @Injectable()
 export class AuthService {
@@ -12,25 +33,131 @@ export class AuthService {
     private usersService: UsersService, 
     private jwtService: JwtService,
     private prisma: PrismaService,
-    private cryptoService: CryptoService
+    private cryptoService: CryptoService,
+    private ipRecordService: IpRecordService,
   ) {}
 
-  async validateUser(login: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOne(login);
+  async validateUser(login: string, pass: string, ip: string): Promise<IUserData | IValidationError> {
+    
+    const user = await this.usersService.findOneWithLastLoginRecord(login);
     if (!user){
-      return null
+      return { message: "No user has been found"}
     }
+
+    const loginRecord = user.logins.at(0);
+    const databaseIpRecord = await this.ipRecordService.getIpRecordByIp(ip);
+    const currentDate = new Date();
+    if(!loginRecord && databaseIpRecord){
+      if(databaseIpRecord.isBlockedPermanently){
+        return { message: "Your IP address has been blocked permanently"};
+      } 
+      if(databaseIpRecord.blockedUntil > currentDate){
+        return { message: "Your IP address has been blocked temporarily. Please try again later."}
+      }
+    }
+    
+    if(ip === loginRecord.ipAddress.ipAddress){
+      if(loginRecord.ipAddress.isBlockedPermanently){
+        
+        return { message: "Your IP address has been blocked permanently"};
+      }
+      if(loginRecord.ipAddress.blockedUntil > currentDate){
+        return { message: "Your IP address has been blocked temporarily. Please try again later."}
+      } 
+    }
+    if(!loginRecord.wasLoginSuccessful){
+      let blockDate = new Date(loginRecord.loginTime);
+      switch(loginRecord.attempt){
+        case 1:{
+          blockDate.setSeconds(blockDate.getSeconds() + 5);
+          break
+        }
+        case 2:{
+          blockDate.setSeconds(blockDate.getSeconds() + 10);
+          break;
+        }
+        default:{
+          blockDate.setMinutes(blockDate.getMinutes() + 2);
+          break;
+        }
+      }
+      
+      if(blockDate > currentDate){
+        return { message: "Logging to this account has been temporarily blocked. Please try again later."};
+      }
+    }
+
     const isValid = this.cryptoService.validateMasterPassword(user,pass)
 
     if(isValid){
       const userData = {id: user.id,login: user.login}
+      const loginRecordData: CreateLoginRecordDto = {
+        loginTime: currentDate,
+        wasLoginSuccessful: true,
+        attempt: 0,
+        userId: user.id
+      }
+      if(!databaseIpRecord){
+        const ipRecordDto: CreateIpRecordDto = {
+          ipAddress: ip,
+          blockedUntil: null,
+          isBlockedPermanently: false
+        }
+        this.prisma.iPRecord.create({ data: { ...ipRecordDto, logins: { create: loginRecordData}}})
+      }
+      else{
+        this.prisma.loginRecord.create({ data: loginRecordData })
+      }
+      
       return userData
     }
 
-    return null;
+    let blockDate: Date | "perm-block" = currentDate;
+      switch(loginRecord.attempt){
+        case 1:{
+          blockDate.setSeconds(blockDate.getSeconds() + 5);
+          //add record update ip record with date (not perm)
+          break
+        }
+        case 2:{
+          //add record and update ip record with date (not perm)
+          blockDate.setSeconds(blockDate.getSeconds() + 10);
+          break;
+        }
+        default:{
+          //add record update ip record with date (perm)
+          blockDate = "perm-block";
+          break;
+        }
+    }
+
+    
+    const loginRecordData: CreateLoginRecordDto = {
+      loginTime: currentDate,
+      wasLoginSuccessful: false,
+      attempt: loginRecord.attempt + 1,
+      userId: user.id
+    }
+    if(!databaseIpRecord){
+      const ipRecordDto: CreateIpRecordDto = {
+        ipAddress: ip,
+        blockedUntil: blockDate === "perm-block" ? new Date() : blockDate,
+        isBlockedPermanently: blockDate === "perm-block"
+      }
+      this.prisma.iPRecord.create({ data: { ...ipRecordDto, logins: { create: loginRecordData}}})
+    }
+    else{
+      const ipRecordDto: UpdateIpRecordDto = {
+        blockedUntil: blockDate === "perm-block" ? new Date() : blockDate,
+        isBlockedPermanently: blockDate === "perm-block"
+      }
+      this.prisma.iPRecord.update({ where: { id: databaseIpRecord.id }, data: { ...ipRecordDto, logins: {create: loginRecordData}}})
+    }
+
+    return {message: "Invalid login data. Please try again later."};
   }
 
-  async login(user: any) {
+  async login(user: User) {
     const payload = { login: user.login, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),

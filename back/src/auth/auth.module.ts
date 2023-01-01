@@ -9,12 +9,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CryptoService } from 'src/crypto/crypto.service';
 import { CryptoModule } from 'src/crypto/crypto.module';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { IpRecordService } from 'src/ip-record/ip-record.service';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
     CryptoModule,
+    IpRecordService,
     PrismaModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
