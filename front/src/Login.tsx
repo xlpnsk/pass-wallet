@@ -50,15 +50,19 @@ export const Login: React.FC = () => {
               }
             })
             .catch((err) => {
+              console.log(err);
               if (err.response.status === 401) {
-                toast("Invalid login or password.", {
-                  type: "error",
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  progress: undefined,
-                  theme: "light",
-                });
+                toast(
+                  err.response.data.message || "Invalid login or password.",
+                  {
+                    type: "error",
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    progress: undefined,
+                    theme: "light",
+                  }
+                );
               } else {
                 toast("Error occured. Try again later.", {
                   type: "error",

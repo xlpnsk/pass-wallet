@@ -13,9 +13,11 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UsersService } from './users/users.service';
 import { LoginRecordService } from './login-record/login-record.service';
 import { IpRecordService } from './ip-record/ip-record.service';
+import { IpRecordModule } from './ip-record/ip-record.module';
+import { LoginRecordModule } from './login-record/login-record.module';
 
 @Module({
-  imports: [WalletModule, AuthModule, UsersModule, CryptoModule, PrismaModule],
+  imports: [WalletModule, AuthModule, UsersModule, CryptoModule, PrismaModule, IpRecordModule, LoginRecordModule],
   controllers: [AppController, WalletController],
   providers: [AppService, WalletService, PrismaService, CryptoService, UsersService, LoginRecordService, IpRecordService],
 })

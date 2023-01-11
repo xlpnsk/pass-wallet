@@ -4,6 +4,8 @@ import { useLocation } from "wouter";
 import { UserContext } from "./App";
 import http from "./httpService";
 import { PasswordModal } from "./PasswordModal";
+import { SharedWallet } from "./SharedWallet";
+import { ShareRecordModal } from "./ShareRecordModal";
 import { UpdateRecordModal } from "./UpdateRecordModal";
 import "./wallet.css";
 
@@ -22,6 +24,7 @@ export interface IPassword {
 export const Wallet = () => {
   const [records, setRecords] = React.useState<IRecord[]>([]);
   const [editedRecord, setEditedRecord] = React.useState<number | null>(null);
+  const [sharedRecord, setSharedRecord] = React.useState<number | null>(null);
   const [password, setPassword] = React.useState<IPassword | null>(null);
   const {
     login,
@@ -140,6 +143,14 @@ export const Wallet = () => {
     await navigator.clipboard.writeText(password!.password);
   };
 
+  function openShareModal(id: number) {
+    setSharedRecord(id);
+  }
+
+  function closeShareModal() {
+    setSharedRecord(null);
+  }
+
   function openModal(id: number) {
     setEditedRecord(id);
   }
@@ -204,6 +215,7 @@ export const Wallet = () => {
           <div>Password</div>
           <div></div>
           <div></div>
+          <div></div>
         </li>
       </ul>
       <ul className="list">
@@ -231,9 +243,28 @@ export const Wallet = () => {
             <div>
               <button onClick={() => deleteRecord(record.id)}>Delete</button>
             </div>
+            <div>
+              <button onClick={() => openShareModal(record.id)}>Share</button>
+            </div>
           </li>
         ))}
       </ul>
+      <div className="shared-section">
+        <h3>Shared passwords:</h3>
+        <SharedWallet
+          setIsPasswordModalOpen={setIsPasswordModalOpen}
+          setLocation={setLocation}
+          dispatch={dispatch}
+          masterPassword={masterPassword}
+          login={login}
+        />
+      </div>
+      <ShareRecordModal
+        isOpen={!!sharedRecord}
+        onRequestClose={closeShareModal}
+        contentLabel="Share Modal"
+        recordId={sharedRecord}
+      />
       <UpdateRecordModal
         isOpen={!!editedRecord}
         onRequestClose={closeModal}

@@ -41,23 +41,35 @@ model IPRecord {
 }
 
 model WalletRecord {
-  id          Int     @id @default(autoincrement())
-  password    String
-  webAddress  String?
-  description String?
-  login       String?
+  id                  Int     @id @default(autoincrement())
+  password            String
+  webAddress          String?
+  description         String?
+  login               String?
 
-  user   User? @relation(fields: [userId], references: [id])
-  userId Int?
+  user                User?   @relation(fields: [userId], references: [id])
+  userId              Int?
 
   sharedWalletRecords SharedWalletRecord[]
 }
 
+// model SharedWalletRecord {
+//   id             Int          @id @default(autoincrement())
+//   walletRecordId Int
+//   wallletRecord  WalletRecord @relation(fields: [walletRecordId], references: [id])
+
+//   userId Int
+//   user   User @relation(fields: [userId], references: [id])
+// }
+
 model SharedWalletRecord {
   id             Int          @id @default(autoincrement())
+  password       String
+  isActive       Boolean
+
   walletRecordId Int
   wallletRecord  WalletRecord @relation(fields: [walletRecordId], references: [id])
-
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
+  
+  coOwnerId      Int
+  coOwner        User         @relation(fields: [coOwnerId], references: [id])
 }

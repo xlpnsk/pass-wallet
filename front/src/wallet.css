@@ -1,4 +1,4 @@
-.list{
+.list {
   list-style: none;
   padding-left: 0;
   display: flex;
@@ -6,18 +6,18 @@
   gap: 20px;
   width: 100%;
 }
-.list li{
+.list li {
   display: grid;
-  grid-template-columns: repeat(6,1fr);
+  grid-template-columns: repeat(7, 1fr);
   align-items: center;
   gap: 10px;
 }
 
-.list li div button{
+.list li div button {
   margin: 0 auto;
 }
 
-.list li div label{
+.list li div label {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -25,13 +25,28 @@
   align-items: center;
   gap: 5px;
 }
-.new-record{
+.new-record {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
   padding: 0 30px;
 }
 
-.password-field input{
+.password-field input {
   width: 100%;
+}
+
+.shared-list {
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+.shared-list li {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+  gap: 10px;
 }

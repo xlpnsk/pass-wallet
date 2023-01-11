@@ -9,21 +9,21 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CryptoService } from 'src/crypto/crypto.service';
 import { CryptoModule } from 'src/crypto/crypto.module';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { IpRecordService } from 'src/ip-record/ip-record.service';
+import { IpRecordModule } from 'src/ip-record/ip-record.module';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
     CryptoModule,
-    IpRecordService,
+    IpRecordModule,
     PrismaModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1h'}
-    })
+      signOptions: { expiresIn: '1h' },
+    }),
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
-  exports: [AuthService]
+  exports: [AuthService],
 })
 export class AuthModule {}
